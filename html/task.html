@@ -6,7 +6,7 @@
   <link rel="icon" type="image/x-icon" href="Beige Black Bold Minimalist Brand Signature Logo (2).png" />
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="task.css">
 
 </head>
 <body>
@@ -61,7 +61,27 @@
 
     </div>
     <div class="projects-section">
-
+      <div id="project-container"></div>
+      <button id="create-project-button">+ Create Project</button>
+      
+      <div id="project-modal" class="modal">
+          <div class="modal-content">
+              <h3>Create New Project</h3>
+              <input type="text" id="project-name" placeholder="Enter project name" />
+              <button id="save-project-button">Save Project</button>
+              <button id="close-project-modal">Close</button>
+          </div>
+      </div>
+      
+      <div id="task-modal" class="modal">
+          <div class="modal-content">
+              <h3>Add New Task</h3>
+              <input type="text" id="task-name" placeholder="Task name" />
+              <textarea id="task-description" placeholder="Task description"></textarea>
+              <button id="save-task-button">Save Task</button>
+              <button id="close-task-modal">Close</button>
+          </div>
+      </div>
 
       <div class="projects-section-header">
         <p></p>
@@ -81,22 +101,14 @@
  
       </div>
       <div id="card-container">
-        <div id="projectss">
-          <div id="project-name"></div>
-          <div id="list-project"><ol id="the-lists">
-          </ol></div>
+
         </div>
     </div>
 
   
       <div class="overlay" id="overlay"></div>
-  
 
-
-
-        </div>
-      </div>
-    </div>
+      
     <script src="task.js"></script>
     
 
