@@ -7,9 +7,44 @@ document.addEventListener('DOMContentLoaded', function () {
   const cardContainer = document.getElementById('card-container');
   const searchBar = document.getElementById('search-bar');
   const resetSearchButton = document.getElementById('reset-search');
+
+
+
+//////////////////////هذا عشان ترتيب حسب التاريخ
+document.getElementById("sort-button").addEventListener("click", () => {
+  const cardContainer = document.getElementById("card-container");
+  const cards = Array.from(cardContainer.children);
+
+  cards.sort((a, b) => {
+      const nameA = a.querySelector(".card-date")?.textContent.toUpperCase() || "";
+      const nameB = b.querySelector(".card-date")?.textContent.toUpperCase() || "";
+      return nameA.localeCompare(nameB);
+  });
+
+  cardContainer.innerHTML = "";
+  cards.forEach(card => cardContainer.appendChild(card));
+});
+  /////////////////////////////////////////هذا عشان ترتيب بالاسم
+  document.getElementById("sort-buttons").addEventListener("click", () => {
+    const cardContainer = document.getElementById("card-container");
+    const cards = Array.from(cardContainer.children);
+    cards.sort((a, b) => {
+        const nameA = a.querySelector(".card-name")?.textContent.toUpperCase() || "";
+        const nameB = b.querySelector(".card-name")?.textContent.toUpperCase() || "";
+        return nameA.localeCompare(nameB);
+    });
+    cardContainer.innerHTML = "";
+    cards.forEach(card => cardContainer.appendChild(card));
+  });
+
+  /////////////////////////////////////////////////////////////////////
+
+
   let editTarget = null;
 
   const colors = ["#012e4d", "#012e4d"];
+  loadCardsFromLocalStorage();
+
 
   addButton.addEventListener('click', openModal);
   cancelButton.addEventListener('click', closeModal);
@@ -33,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
       } else {
           createCard(name, description, date);
       }
+      saveCardsToLocalStorage();
 
       closeModal();
   });
@@ -75,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const card = document.createElement('div');
     card.classList.add('card');
     card.style.backgroundColor = generateRandomColor();
+    
 
     const cardContent = `
         <h4 class="card-name">${name}</h4>
@@ -92,29 +129,12 @@ document.addEventListener('DOMContentLoaded', function () {
   <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
 </svg></button>
         </div>
-        <div class="progress-container">
-            <div class="progress progress-circular my-2" style="--percentage: 10">
-                <div class="progress-bar"></div>
-                <div class="progress-label">10%</div>
-            </div>
-
-            <div class="progress progress-circular my-2" style="--percentage: 20">
-                <div class="progress-bar bg-warning"></div>
-                <div class="progress-label">20%</div>
-            </div>
-
-            <div class="progress progress-circular my-2" style="--percentage: 30">
-                <div class="progress-bar bg-danger"></div>
-                <div class="progress-label">30%</div>
-            </div>
-
-            <div class="progress progress-circular my-2" style="--percentage: 40">
-                <div class="progress-bar bg-success"></div>
-                <div class="progress-label">40%</div>
-            </div>
+        
 
     `;
     card.innerHTML = cardContent;
+    
+
 
     card.querySelector('.edit-button').addEventListener('click', () => {
         editTarget = card;
@@ -126,13 +146,60 @@ document.addEventListener('DOMContentLoaded', function () {
 
     card.querySelector('.complete-button').addEventListener('click', () => {
         card.classList.toggle('completed');
+        const cardData = { name, description, date, color: card.style.backgroundColor };
+
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks.push(cardData);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+
+        card.remove();
+        saveCardsToLocalStorage();
+        alert("Task added to the task list!");
+          
     });
 
     card.querySelector('.delete-button').addEventListener('click', () => {
+        moveCardToArchive(card);
         card.remove();
+
+        saveCardsToLocalStorage();
     });
   
 
     cardContainer.appendChild(card);
   }
+  function moveCardToArchive(card) {
+    const archivedCards = JSON.parse(localStorage.getItem('archivedCards')) || [];
+    const cardData = {
+        name: card.querySelector('.card-name').textContent,
+        description: card.querySelector('.card-description').textContent,
+        date: card.querySelector('.card-date').textContent,
+        color: card.style.backgroundColor
+    };
+    archivedCards.push(cardData);
+    localStorage.setItem('archivedCards', JSON.stringify(archivedCards));
+}
+
+  ////////هذا الكود عشان لما ارجع من صفحه الارشيف الاقيهم موجودين الديفات
+  function saveCardsToLocalStorage() {
+    const cards = document.querySelectorAll('.card');
+    const cardData = Array.from(cards).map(card => ({
+        name: card.querySelector('.card-name').textContent,
+        description: card.querySelector('.card-description').textContent,
+        date: card.querySelector('.card-date').textContent,
+        color: card.style.backgroundColor
+    }));
+    localStorage.setItem('dashboardCards', JSON.stringify(cardData));
+}
+function loadCardsFromLocalStorage() {
+    const savedCards = JSON.parse(localStorage.getItem('dashboardCards')) || [];
+    savedCards.forEach(card => {
+        createCard(card.name, card.description, card.date, card.color);
+    });
+}
+window.addEventListener('beforeunload', saveCardsToLocalStorage);
+createCard("Home Page", "Make sure sponsors are indicated for Tech Talk.", "Jan 16");
+/////////////////////////////////////////////////////////////////////////////////////////
 });
+  
+  
